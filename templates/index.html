@@ -1,17 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <title>MY APP</title>
+    <meta charset="UTF-8">
+    <title>MY APP</title>
 </head>
+
 <body>
 
-<form action="/upload" enctype="multipart/form-data" method="POST">
-   <input type="file" id="files" name="pics" multiple>
-   <input type="submit" value="Upload a file"/>
-</form>
+    <p align="center"><a href=display><button class=grey style="height:75px;width:150px">Show Pictures</button></a></p>
+    <form action="/upload" enctype="multipart/form-data" method="POST">
+        <input type="file" id="files" name="pics" multiple>
+        <input type="submit" value="Upload a file" />
+    </form>
 
-<a href="{{ url_for('logout')}}">Logout Here</a>
+    <a href="{{ url_for('logout')}}">Logout Here</a>
 
 </body>
+
 </html>
