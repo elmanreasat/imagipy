@@ -2,12 +2,16 @@
 <html>
 <head>
     <title> Index </title>
+    <link rel="stylesheet" href="../static/styles/display.css" />
 </head>
 <body>
-{{ image_list }}
-{%  for image in image_list %}
-    <img src="data:image/jpeg;charset=utf-8;base64,{{ image }}" alt="img_data"  id="imgslot"/>
-{%  endfor %}
+
+<div class="images">
+    {#<img src="data:image/jpeg;charset=utf-8;base64,{{ image }}" alt="img_data"  id="imgslot"/>#}
+    {%  for image in image_list %}
+        <img src="data:charset=utf-8;base64,{{ image }}" alt="img_data"  id="imgslot"/>
+    {%  endfor %}
+</div>
 </body>
 
 </html>

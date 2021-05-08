@@ -85,13 +85,12 @@ def logout():
 @app.route('/display')
 def display():
     pic_list = Img.query.all()
-    decoded_pic_list=[]
-    mimetype_list =[]
+    base64pic_list = []
     for pic in pic_list:
-        import pdb; pdb.set_trace()
-        decoded_pic_list.append(base64.decodebytes(pic.img))
-        mimetype_list.append(pic.mimetype)
-    return render_template('display.html', mimetype_list=mimetype_list,image_list=decoded_pic_list)
+        base64pic = base64.b64encode(pic.img).decode()
+        base64pic_list.append(base64pic)
+
+    return render_template('display.html', image_list = base64pic_list)
 
 
 @app.route('/upload', methods=['POST'])
