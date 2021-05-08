@@ -1,8 +1,9 @@
-from flask import Flask, request, render_template, redirect, flash
+from flask import Flask, request, render_template, redirect, flash, Response
 from flask_login import current_user, login_user, login_required, logout_user
 from werkzeug.utils import secure_filename
 from db import db_init, db
 from models import Img, login, User
+import base64
 
 
 app = Flask(__name__)
@@ -17,6 +18,7 @@ login.login_view = 'login'
 # @app.route('/')
 # def index():
 #     return render_template('index.html')
+
 
 
 @app.route('/')
@@ -79,6 +81,18 @@ def logout():
     logout_user()
     return redirect('/home')
 
+    
+@app.route('/display')
+def display():
+    pic_list = Img.query.all()
+    decoded_pic_list=[]
+    mimetype_list =[]
+    for pic in pic_list:
+        import pdb; pdb.set_trace()
+        decoded_pic_list.append(base64.decodebytes(pic.img))
+        mimetype_list.append(pic.mimetype)
+    return render_template('display.html', mimetype_list=mimetype_list,image_list=decoded_pic_list)
+
 
 @app.route('/upload', methods=['POST'])
 @login_required
@@ -99,3 +113,5 @@ def upload():
         db.session.commit()
 
     return 'Img Uploaded!', 200
+
+

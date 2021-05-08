@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title> Index </title>
+</head>
+<body>
+{{ image_list }}
+{%  for image in image_list %}
+    <img src="data:image/jpeg;charset=utf-8;base64,{{ image }}" alt="img_data"  id="imgslot"/>
+{%  endfor %}
+</body>
+
+</html>
