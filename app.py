@@ -5,7 +5,9 @@ from werkzeug.utils import secure_filename
 from db import db_init, db
 from models import Img, login, User
 import base64
-
+from controllers.upload import upload_images
+from controllers.delete import images_to_delete, delete_images
+from controllers.display import get_priv_images, get_public_images
 
 app = Flask(__name__)
 app.secret_key = 'xyz'
@@ -54,7 +56,7 @@ def register():
         password = request.form['password']
 
         if User.query.filter_by(email=email).first():
-            return ('Email already Present')
+            return 'Email already Present'
 
         user = User(email=email)
         user.set_password(password)
@@ -72,14 +74,10 @@ def logout():
     
 @app.route('/display')
 def display():
-    pic_list_private = Img.query.filter_by(user_id=current_user.get_id())
-    pic_list_public = db.session.query(Img).filter(
-        and_(
-            Img.user_id != current_user.get_id(),
-            Img.private == False
-        )
-    )
+    pic_list_private = get_priv_images(current_user.get_id())
+    pic_list_public = get_public_images(current_user.get_id())
     base64pic_list = []
+
     for pic in pic_list_private:
         base64pic = base64.b64encode(pic.img).decode()
         base64pic_list.append(base64pic)
@@ -87,7 +85,6 @@ def display():
     for pic in pic_list_public:
         base64pic = base64.b64encode(pic.img).decode()
         base64pic_list.append(base64pic)
-
 
     return render_template('display.html', image_list = base64pic_list, user=current_user.email)
 
@@ -98,27 +95,19 @@ def upload():
     pic_list = request.files.getlist("pics")
     if not pic_list:
         return 'No pic uploaded!', 400
-    for pic in pic_list:
-        filename = secure_filename(pic.filename)
-        mimetype = pic.mimetype
-        user_id = current_user.get_id()
-        private = False
-        if request.form.get("privacy") == "true":
-            private = True
-        if not filename or not mimetype or "image" not in str(mimetype):
-            return 'Bad upload!', 400
 
-        img = Img(img=pic.read(), user_id=user_id, private=private,name=filename, mimetype=mimetype)
-        db.session.add(img)
-        db.session.commit()
+    private = request.form.get("privacy") == "true"
 
-    return 'Img Uploaded!', 200
+    if upload_images(pic_list, private, current_user.get_id()):
+        return 'Img Uploaded!', 200
+    else:
+        return 'Bad upload!', 400
 
 
 @app.route('/delete', methods=['POST', 'GET'])
 @login_required
 def delete():
-    pic_list = Img.query.filter_by(user_id=current_user.get_id())
+    pic_list = images_to_delete(current_user.get_id())
     base64pic_list = {}
     if pic_list is None:
         return redirect('/display')
@@ -132,9 +121,5 @@ def delete():
 @app.route('/delete_action', methods=['POST', 'GET'])
 @login_required
 def delete_action():
-    if request.form.get("delete_all"):
-        Img.query.delete()
-    else:
-        Img.query.filter_by(id=request.form.get("user")).delete()
-    db.session.commit()
+    delete_images(current_user.get_id(), request.form.get("user"), request.form.get("delete_all"))
     return redirect('/delete')
