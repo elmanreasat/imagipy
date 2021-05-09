@@ -141,6 +141,9 @@ def delete():
 @login_required
 def delete_action():
     #import pdb;pdb.set_trace()
-    Img.query.filter_by(id=request.form.get("user")).delete()
+    if request.form.get("delete_all"):
+        Img.query.delete()
+    else:
+        Img.query.filter_by(id=request.form.get("user")).delete()
     db.session.commit()
     return redirect('/delete')
