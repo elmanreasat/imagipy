@@ -16,12 +16,6 @@ login.init_app(app)
 login.login_view = 'login'
 
 
-# @app.route('/')
-# def index():
-#     return render_template('index.html')
-
-
-
 @app.route('/')
 def first():
     return redirect('/home')
@@ -31,7 +25,7 @@ def first():
 @login_required
 def blog():
     #import pdb; pdb.set_trace()
-    return render_template('index.html')
+    return render_template('index.html', user=current_user.email)
 
 
 @app.route('/login', methods=['POST', 'GET'])
@@ -47,7 +41,6 @@ def login():
         if user is not None and user.check_password(request.form['password']):
             #import pdb;pdb.set_trace()
             login_user(user)
-            #login_user(user)
             return redirect('/home')
         else:
             flash('No user found')
@@ -85,7 +78,7 @@ def logout():
     
 @app.route('/display')
 def display():
-    pic_list = Img.query.filter_by(user_id=current_user.get_id())
+    pic_list_private = Img.query.filter_by(user_id=current_user.get_id())
     pic_list_public = db.session.query(Img).filter(
         and_(
             Img.user_id != current_user.get_id(),
@@ -93,7 +86,7 @@ def display():
         )
     )
     base64pic_list = []
-    for pic in pic_list:
+    for pic in pic_list_private:
         base64pic = base64.b64encode(pic.img).decode()
         base64pic_list.append(base64pic)
 
@@ -101,7 +94,8 @@ def display():
         base64pic = base64.b64encode(pic.img).decode()
         base64pic_list.append(base64pic)
 
-    return render_template('display.html', image_list = base64pic_list)
+
+    return render_template('display.html', image_list = base64pic_list, user=current_user.email)
 
 
 @app.route('/upload', methods=['POST'])
@@ -128,3 +122,25 @@ def upload():
     return 'Img Uploaded!', 200
 
 
+@app.route('/delete', methods=['POST', 'GET'])
+@login_required
+def delete():
+    pic_list = Img.query.filter_by(user_id=current_user.get_id())
+    base64pic_list = {}
+    #import pdb;pdb.set_trace()
+    if pic_list is None:
+        return redirect('/display')
+    for pic in pic_list:
+        base64pic = base64.b64encode(pic.img).decode()
+        base64pic_list[pic.id] = base64pic
+
+    return render_template('delete.html', image_list=base64pic_list, user=current_user.email)
+
+
+@app.route('/delete_action', methods=['POST', 'GET'])
+@login_required
+def delete_action():
+    #import pdb;pdb.set_trace()
+    Img.query.filter_by(id=request.form.get("user")).delete()
+    db.session.commit()
+    return redirect('/delete')
