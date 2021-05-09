@@ -17,6 +17,9 @@ class User(UserMixin, db.Model):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
+    def get_id(self):
+        return self.id
+
 
 class Img(db.Model):
     id = db.Column(db.Integer, unique=True, primary_key=True, )
@@ -28,4 +31,4 @@ class Img(db.Model):
 
 @login.user_loader
 def load_user(id):
-    return User.query.get(int(id))
+    return User.query.filter_by(id=id).first()

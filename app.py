@@ -4,6 +4,7 @@ from werkzeug.utils import secure_filename
 from db import db_init, db
 from models import Img, login, User
 
+
 app = Flask(__name__)
 app.secret_key = 'xyz'
 app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///image.db'
@@ -26,12 +27,14 @@ def first():
 @app.route('/home')
 @login_required
 def blog():
+    #import pdb; pdb.set_trace()
     return render_template('index.html')
 
 
 @app.route('/login', methods=['POST', 'GET'])
 def login():
     if current_user.is_authenticated:
+        #import pdb;pdb.set_trace()
         return redirect('/home')
 
     if request.method == 'POST':
@@ -39,7 +42,9 @@ def login():
         user = User.query.filter_by(email=email).first()
         #import pdb; pdb.set_trace()
         if user is not None and user.check_password(request.form['password']):
-            login_user(user)
+            #import pdb;pdb.set_trace()
+            login_user(user, force=True, remember=True)
+            #login_user(user)
             return redirect('/home')
         else:
             flash('No user found')
@@ -76,9 +81,10 @@ def logout():
 
 
 @app.route('/upload', methods=['POST'])
+@login_required
 def upload():
     pic_list = request.files.getlist("pics")
-    #import pdb; pdb.set_trace()
+    #import pdb;pdb.set_trace()
     if not pic_list:
         return 'No pic uploaded!', 400
     for pic in pic_list:
