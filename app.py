@@ -24,22 +24,18 @@ def first():
 @app.route('/home')
 @login_required
 def blog():
-    #import pdb; pdb.set_trace()
     return render_template('index.html', user=current_user.email)
 
 
 @app.route('/login', methods=['POST', 'GET'])
 def login():
     if current_user.is_authenticated:
-        #import pdb;pdb.set_trace()
         return redirect('/home')
 
     if request.method == 'POST':
         email = request.form['email']
         user = User.query.filter_by(email=email).first()
-        #import pdb; pdb.set_trace()
         if user is not None and user.check_password(request.form['password']):
-            #import pdb;pdb.set_trace()
             login_user(user)
             return redirect('/home')
         else:
@@ -56,8 +52,6 @@ def register():
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
-
-        #import pdb;pdb.set_trace()
 
         if User.query.filter_by(email=email).first():
             return ('Email already Present')
@@ -102,7 +96,6 @@ def display():
 @login_required
 def upload():
     pic_list = request.files.getlist("pics")
-    #import pdb;pdb.set_trace()
     if not pic_list:
         return 'No pic uploaded!', 400
     for pic in pic_list:
@@ -127,7 +120,6 @@ def upload():
 def delete():
     pic_list = Img.query.filter_by(user_id=current_user.get_id())
     base64pic_list = {}
-    #import pdb;pdb.set_trace()
     if pic_list is None:
         return redirect('/display')
     for pic in pic_list:
@@ -140,7 +132,6 @@ def delete():
 @app.route('/delete_action', methods=['POST', 'GET'])
 @login_required
 def delete_action():
-    #import pdb;pdb.set_trace()
     if request.form.get("delete_all"):
         Img.query.delete()
     else:
