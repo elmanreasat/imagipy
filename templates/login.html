@@ -1,0 +1,15 @@
+<form action="" method = "POST">
+    <p>email <input type = "email" name = "email" /></p>
+    <p>password <input type = "password" name = "password" /></p>
+    <p> submit <input type = "submit" value = "Submit" /></p>
+</form>
+
+{% for message in get_flashed_messages() %}
+    <div class="alert alert-warning">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        {{ message }}
+    </div>
+{% endfor %}
+
+<h3>Dont Have an account??</h3>
+<h3><a href = "{{url_for('register') }}">Register Here</a></h3>
