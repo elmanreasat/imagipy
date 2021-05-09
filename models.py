@@ -24,6 +24,7 @@ class User(UserMixin, db.Model):
 class Img(db.Model):
     id = db.Column(db.Integer, unique=True, primary_key=True, )
     user_id = db.Column(db.Integer, nullable=False)
+    private = db.Column(db.Boolean, default=False, nullable=False)
     img = db.Column(db.Text, nullable=False)
     name = db.Column(db.Text, nullable=False)
     mimetype = db.Column(db.Text, nullable=False)

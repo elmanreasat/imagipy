@@ -1,8 +1,10 @@
-from flask import Flask, request, render_template, redirect, flash
+from flask import Flask, request, render_template, redirect, flash, Response
 from flask_login import current_user, login_user, login_required, logout_user
+from sqlalchemy import and_
 from werkzeug.utils import secure_filename
 from db import db_init, db
 from models import Img, login, User
+import base64
 
 
 app = Flask(__name__)
@@ -17,6 +19,7 @@ login.login_view = 'login'
 # @app.route('/')
 # def index():
 #     return render_template('index.html')
+
 
 
 @app.route('/')
@@ -43,7 +46,7 @@ def login():
         #import pdb; pdb.set_trace()
         if user is not None and user.check_password(request.form['password']):
             #import pdb;pdb.set_trace()
-            login_user(user, force=True, remember=True)
+            login_user(user)
             #login_user(user)
             return redirect('/home')
         else:
@@ -79,6 +82,27 @@ def logout():
     logout_user()
     return redirect('/home')
 
+    
+@app.route('/display')
+def display():
+    pic_list = Img.query.filter_by(user_id=current_user.get_id())
+    pic_list_public = db.session.query(Img).filter(
+        and_(
+            Img.user_id != current_user.get_id(),
+            Img.private == False
+        )
+    )
+    base64pic_list = []
+    for pic in pic_list:
+        base64pic = base64.b64encode(pic.img).decode()
+        base64pic_list.append(base64pic)
+
+    for pic in pic_list_public:
+        base64pic = base64.b64encode(pic.img).decode()
+        base64pic_list.append(base64pic)
+
+    return render_template('display.html', image_list = base64pic_list)
+
 
 @app.route('/upload', methods=['POST'])
 @login_required
@@ -91,11 +115,16 @@ def upload():
         filename = secure_filename(pic.filename)
         mimetype = pic.mimetype
         user_id = current_user.get_id()
+        private = False
+        if request.form.get("privacy") == "true":
+            private = True
         if not filename or not mimetype or "image" not in str(mimetype):
             return 'Bad upload!', 400
 
-        img = Img(img=pic.read(), user_id=user_id,name=filename, mimetype=mimetype)
+        img = Img(img=pic.read(), user_id=user_id, private=private,name=filename, mimetype=mimetype)
         db.session.add(img)
         db.session.commit()
 
     return 'Img Uploaded!', 200
+
+
