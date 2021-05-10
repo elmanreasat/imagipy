@@ -6,16 +6,22 @@ securely stored in a sqlite database.
 
 ## Running the App
 
+- firstly clone the repo
+
+```bash
+git clone https://github.com/elmanreasat/imagipy.git
+```
+
+- now follow any one of the steps below
+
 ### 1. Using Docker
 
 - make sure you have docker installed.
 - from the project root run the following commands.
 
 ```bash
-
 docker build -t imagipy:latest .
 docker run -p 5000:5000 --network="host" imagipy
-
 ```
 - The app is now running on http://localhost:5000/
 
