@@ -4,9 +4,26 @@ Imagipy is a Flask app for an image repository system
 that allows users to make private or public uploads which are 
 securely stored in a sqlite database.
 
-## Installation
+## Running the App
+
+### 1. Using Docker
+
+- make sure you have docker installed.
+- from the project root run the following commands.
+
+```bash
+
+docker build -t imagipy:latest .
+docker run -p 5000:5000 --network="host" imagipy
+
+```
+- The app is now running on http://localhost:5000/
+
+### 2. Using Python
 
 Use the package manager [pip](https://pip.pypa.io/en/stable/) to install the dependencies.
+
+- install these dependencies
 
 ```bash
 pip install flask 
@@ -15,15 +32,13 @@ pip install flask-login
 pip install sqlalchemy
 ```
 
-## Running the App
-
-Run this command on your terminal
+- Run this command on your terminal
 
 ```python
 python -m flask run
 ```
 
-the app is now running on http://localhost:5000/
+- the app is now running on http://localhost:5000/
 
 ## How does the Imagipy App work?
 
