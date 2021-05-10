@@ -1,9 +1,7 @@
 from flask import Flask, request, render_template, redirect, flash, Response
 from flask_login import current_user, login_user, login_required, logout_user
-from sqlalchemy import and_
-from werkzeug.utils import secure_filename
 from db import db_init, db
-from models import Img, login, User
+from models import login, User
 import base64
 from controllers.upload import upload_images
 from controllers.delete import images_to_delete, delete_images
